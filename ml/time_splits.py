@@ -22,8 +22,11 @@ def determine_splits(config):
         'feature_end',
         'train_label_start',
         'train_label_end',
+        'test_feature_start',
+        'test_feature_end',
         'test_label_start',
-        'test_label_end'])
+        'test_label_end',
+        'group'])
 
     test_label_starts = np.arange(
         start=label_start,
@@ -31,6 +34,7 @@ def determine_splits(config):
         step=time_config['model_update_frequency'])
 
     j=0
+    group=0
     for test_start in test_label_starts:
         train_label_ends = np.arange(
             test_start - time_config['max_training_histories'] + time_config['training_label_timespans'],
@@ -39,31 +43,68 @@ def determine_splits(config):
         test_label_starts = train_label_ends - time_config['training_label_timespans']
         feature_ends = test_label_starts
         feature_starts = np.maximum(test_start - time_config['max_training_histories'], feature_start)
-        feature_starts = np.minimum(feature_end - time_config['min_training_histories'], feature_starts)
+        feature_starts = np.minimum(feature_ends - time_config['min_training_histories'], feature_starts)
+
+        test_feature_end = test_start
+        test_feature_start = np.maximum(test_start - time_config['max_training_histories'], feature_start)
+        test_feature_start = np.minimum(test_feature_end - time_config['min_training_histories'], test_feature_start)
         
         
         for i in range(len(feature_ends)):
             new_split = {
-                'feature_start': feature_starts,
+                'feature_start': feature_starts[i],
                 'feature_end': feature_ends[i],
                 'train_label_start': test_label_starts[i],
                 'train_label_end': train_label_ends[i],
+                'test_feature_start': test_feature_start,
+                'test_feature_end': test_feature_end,
                 'test_label_start': test_start,
-                'test_label_end': test_start + time_config['test_label_timespans']
+                'test_label_end': test_start + time_config['test_label_timespans'],
+                'group': group
             }
             new_split = pd.DataFrame(new_split, index=[j])
-            j+=1
             split_df = pd.concat([split_df,new_split], ignore_index=True)
 
-    split_df[split_df.select_dtypes(include=[np.number]).ge(0).all(1)]
+            j+=1
+        group += 1
+
+    split_df = split_df[(split_df >= 0).all(1)]
     return split_df
 
 
 
-def split_data():
+def generating_splits(split_df, df, labels):
+    df = df.merge(labels, on=['fips', 'period'], how='left')
+
+    X_trains = []
+    y_trains = []
+    X_tests = []
+    y_tests = []
+    groups = []
+    for group in split_df['group'].unique():
+        for i in split_df.loc[split_df['group'] == group,:].index:
+            
+            X_trains.append(df.loc[
+                (df['period']>=split_df.loc[i,'feature_start']) &
+                (df['period']<split_df.loc[i,'feature_end']),
+                :])
+            y_trains.append(X_trains[0]['production'].head(1))
+
+            X_tests.append(df.loc[
+                (df['period']>=split_df.loc[i,'test_feature_start']) &
+                (df['period']<split_df.loc[i,'test_feature_end']),
+                :])
+            y_tests.append(X_tests[0]['production'].head(1))
+            groups.append(group)
+
+    return X_trains, y_trains, X_tests, y_tests, groups
+
+
+def split_data(features, labels):
     config_path = 'ml/config.yaml'
     with open(config_path, 'r') as dbf:
         config = yaml.safe_load(dbf)
 
     split_df = determine_splits(config)
+    validation_sets = generating_splits(split_df, features, labels)
     return split_df

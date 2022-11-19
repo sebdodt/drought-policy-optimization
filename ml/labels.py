@@ -79,6 +79,7 @@ def match_counties(df):
     # loop through all counties to append fips codes
     for i in range(len(df)):
         df.loc[i,'fips'] = af.get_county_fips(df.loc[i,'County'], state=state)
+    df['fips'] = df['fips'].astype(int)
     # 50 counties are matched, meaning 8 counties are missing. 
     # These are likely small counties without water production
     return df
