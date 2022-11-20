@@ -13,6 +13,6 @@ validation_sets_eng = features.generate_features(validation_sets)
 validation_sets_bound = time_splits.rbind_df(validation_sets_eng)
 
 # model training
-
-
+rmse = training.train(validation_sets_bound)
+print(rmse)
 print("Done")
