@@ -88,13 +88,13 @@ def generating_splits(split_df, df, labels):
                 (df['period']>=split_df.loc[i,'feature_start']) &
                 (df['period']<split_df.loc[i,'feature_end']),
                 :])
-            y_trains.append(X_trains[0]['production'].head(1))
+            y_trains.append(df.loc[df['period'] == split_df.loc[i,'feature_end'] - 1, ['fips','y']].drop_duplicates())
 
             X_tests.append(df.loc[
                 (df['period']>=split_df.loc[i,'test_feature_start']) &
                 (df['period']<split_df.loc[i,'test_feature_end']),
                 :])
-            y_tests.append(X_tests[0]['production'].head(1))
+            y_tests.append(df.loc[df['period'] == split_df.loc[i,'test_feature_end'] - 1, ['fips','y']].drop_duplicates())
             groups.append(group)
 
     return X_trains, y_trains, X_tests, y_tests, groups
@@ -108,3 +108,37 @@ def split_data(features, labels):
     split_df = determine_splits(config)
     validation_sets = generating_splits(split_df, features, labels)
     return validation_sets
+
+
+def rbind_df(validation_sets_eng):
+    X_trains, y_trains, X_tests, y_tests, groups = validation_sets_eng
+    X_train_bind = [X_trains[0]]
+    y_train_bind = [y_trains[0]]
+    for i in range(1,len(X_trains)):
+        if groups[i] == groups[i-1]:
+            X_train_bind[-1] = pd.concat(
+                [X_train_bind[-1],X_trains[i]],
+                ignore_index=True)
+            y_train_bind[-1] = pd.concat(
+                [y_train_bind[-1],y_trains[i]],
+                ignore_index=True)            
+        else:
+            X_train_bind.append(X_trains[i])
+            y_train_bind.append(y_trains[i])
+    
+    X_test_bind = [X_tests[0]]
+    y_test_bind = [y_tests[0]]
+    for i in range(1,len(X_tests)):
+        if groups[i] == groups[i-1]:
+            X_test_bind[-1] = pd.concat(
+                [X_test_bind[-1],X_tests[i]],
+                ignore_index=True)
+            y_test_bind[-1] = pd.concat(
+                [y_test_bind[-1],y_tests[i]],
+                ignore_index=True)      
+        else:
+            X_test_bind.append(X_tests[i])
+            y_test_bind.append(y_tests[i])
+            
+    return X_train_bind, y_train_bind, X_test_bind, y_test_bind, groups
+    

@@ -24,12 +24,10 @@ def generate_features(datalist):
     X_trains, y_trains, X_tests, y_tests, groups = datalist
 
     X_trains_eng = []
-    y_trains_eng = []
     X_tests_eng = []
-    y_tests_eng = []
     for i in range(len(X_trains)):
-        train = X_trains[i][['fips','period', 'latitude', 'longitude']].copy()
-        test = X_tests[i][['fips', 'period', 'latitude', 'longitude']].copy()
+        train = X_trains[i][['fips', 'latitude', 'longitude']].copy()
+        test = X_tests[i][['fips', 'latitude', 'longitude']].copy()
         train.drop_duplicates(inplace=True)
         test.drop_duplicates(inplace=True)
 
@@ -37,61 +35,73 @@ def generate_features(datalist):
         continuous = [
             'tempmax', 'tempmin', 'temp', 'feelslikemax',
             'feelslikemin', 'feelslike', 'dew', 'humidity', 'precip', 'precipprob',
-            'precipcover', 'preciptype', 'snow', 'snowdepth',
+            'precipcover', 'snow', 'snowdepth',
             'windspeed', 'winddir', 'sealevelpressure', 'cloudcover', 'visibility',
             'solarradiation', 'solarenergy', 'uvindex'
         ]
         categorical = [
-            'conditions', 'icon'
+            'conditions', 'icon', 'preciptype'
         ]
         imputations = ['snow', 'snowdepth']
 
         
         ## imputations
-        X_trains[i][imputations].fillna(0, inplace=True)
-        
-
-        ## add avg
-        avgs = X_trains[i] \
-            .groupby(['fips', 'period'])[continuous] \
-            .mean() \
-            .reset_index()
-        train = train.merge(avgs, on=['fips', 'period'], how='left')
-        for var in continuous:
-            train.rename({var:'avg_'+var}, axis=1, inplace=True)
+        for j in ['train', 'test']:
+            if j == 'train':
+                source = X_trains[i]
+            elif j == 'test':
+                source = X_tests[i]
+            else:
+                raise ValueError
 
 
-        ## add avg
-        avg_cols = [
-            'tempmax',
-            'tempmin',
-            'temp',
-            'feelslikemax',
-            'feelslikemin',
-            'feelslike',
-            'dew',
-            'humidity',
-            ''
-            ]
-        
+            source[imputations] = source[imputations].fillna(0)
+            
 
-        ## add max
-        max_cols = ['tempmax']
+            ## monthly avg
+            avgs = source \
+                .groupby(['fips', 'period'])[continuous] \
+                .mean() \
+                .reset_index()
 
 
-        ## add min
-        min_cols = ['tempmax']
+            ## add monthly avg
+            avgs_monthly = avgs \
+                .groupby(['fips'])[continuous] \
+                .mean() \
+                .reset_index()
+            train = train.merge(avgs_monthly, on=['fips'], how='left')
+            for var in continuous:
+                train.rename({var:'avg_'+var}, axis=1, inplace=True)
 
 
-        ## add since
-        since_cols = []
+            ## add monthly max
+            max_monthly = avgs \
+                .groupby(['fips'])[continuous] \
+                .max() \
+                .reset_index()
+            train = train.merge(max_monthly, on=['fips'], how='left')
+            for var in continuous:
+                train.rename({var:'max_'+var}, axis=1, inplace=True)
 
 
-        X_trains_eng.append(train)
-        return X_trains_eng
+            ## add min
+            min_monthly = avgs \
+                .groupby(['fips'])[continuous] \
+                .max() \
+                .reset_index()
+            train = train.merge(min_monthly, on=['fips'], how='left')
+            for var in continuous:
+                train.rename({var:'min_'+var}, axis=1, inplace=True)
 
+            if j == 'train':
+                X_trains_eng.append(train)
+            elif j == 'test':
+                X_tests_eng.append(train)
+            else:
+                raise ValueError
+            
+    return X_trains_eng, y_trains, X_tests_eng, y_tests, groups
+    
 
-
-if __name__=='__main__':
-    df = read_data()
 
