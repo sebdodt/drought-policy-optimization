@@ -107,4 +107,4 @@ def split_data(features, labels):
 
     split_df = determine_splits(config)
     validation_sets = generating_splits(split_df, features, labels)
-    return split_df
+    return validation_sets
