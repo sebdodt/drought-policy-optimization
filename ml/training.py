@@ -10,9 +10,6 @@ def train_baseline(X_train, y_train, X_test, y_test):
     return math.sqrt(mse)
 
 
-
-
-
 def train(datalist):
     X_trains, y_trains, X_tests, y_tests, groups = datalist
 
