@@ -15,8 +15,29 @@ def read_data():
     # rename fips column
     df.rename({'name': 'fips'}, axis=1, inplace=True)
     # df['fips'] = df['fips'].astype(int)
+    df.drop(['sealevelpressure', 'visibility'], axis=1, inplace=True)
+
     return df
     
+
+
+def na_imputation(X_trains_eng, y_trains, X_tests_eng, y_tests):
+    X_trains_new = []
+    y_trains_new = []
+    X_tests_new = []
+    y_tests_new = []
+    for i in range(len(X_trains_eng)):
+        X_trains_eng[i].reset_index(drop=True, inplace=True)
+        y_trains[i].reset_index(drop=True, inplace=True)
+        X_tests_eng[i].reset_index(drop=True, inplace=True)
+        y_tests[i].reset_index(drop=True, inplace=True)
+
+        X_trains_new.append(X_trains_eng[i].loc[~y_trains[i]['y'].isna(),:])
+        y_trains_new.append(y_trains[i].loc[~y_trains[i]['y'].isna(),:])
+        X_tests_new.append(X_tests_eng[i].loc[~y_tests[i]['y'].isna(),:])
+        y_tests_new.append(y_tests[i].loc[~y_tests[i]['y'].isna(),:])
+    
+    return X_trains_new, y_trains_new, X_tests_new, y_tests_new
 
 
 
@@ -36,8 +57,8 @@ def generate_features(datalist):
             'tempmax', 'tempmin', 'temp', 'feelslikemax',
             'feelslikemin', 'feelslike', 'dew', 'humidity', 'precip', 'precipprob',
             'precipcover', 'snow', 'snowdepth',
-            'windspeed', 'winddir', 'sealevelpressure', 'cloudcover', 'visibility',
-            'solarradiation', 'solarenergy', 'uvindex'
+            'windspeed', 'winddir', 'cloudcover', 
+            'solarradiation', 'solarenergy', 'uvindex' #'sealevelpressure', 'visibility'
         ]
         categorical = [
             'conditions', 'icon', 'preciptype'
@@ -49,8 +70,10 @@ def generate_features(datalist):
         for j in ['train', 'test']:
             if j == 'train':
                 source = X_trains[i]
+                base = train
             elif j == 'test':
                 source = X_tests[i]
+                base = test
             else:
                 raise ValueError
 
@@ -70,7 +93,7 @@ def generate_features(datalist):
                 .groupby(['fips'])[continuous] \
                 .mean() \
                 .reset_index()
-            train = train.merge(avgs_monthly, on=['fips'], how='left')
+            train = base.merge(avgs_monthly, on=['fips'], how='left')
             for var in continuous:
                 train.rename({var:'avg_'+var}, axis=1, inplace=True)
 
@@ -100,6 +123,8 @@ def generate_features(datalist):
                 X_tests_eng.append(train)
             else:
                 raise ValueError
+    
+    X_trains_eng, y_trains, X_tests_eng, y_tests = na_imputation(X_trains_eng, y_trains, X_tests_eng, y_tests)
             
     return X_trains_eng, y_trains, X_tests_eng, y_tests, groups
     

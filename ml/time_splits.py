@@ -96,7 +96,6 @@ def generating_splits(split_df, df, labels):
                 :])
             y_tests.append(df.loc[df['period'] == split_df.loc[i,'test_feature_end'] - 1, ['fips','y']].drop_duplicates())
             groups.append(group)
-
     return X_trains, y_trains, X_tests, y_tests, groups
 
 
@@ -125,11 +124,12 @@ def rbind_df(validation_sets_eng):
         else:
             X_train_bind.append(X_trains[i])
             y_train_bind.append(y_trains[i])
-    
+
     X_test_bind = [X_tests[0]]
     y_test_bind = [y_tests[0]]
     for i in range(1,len(X_tests)):
         if groups[i] == groups[i-1]:
+
             X_test_bind[-1] = pd.concat(
                 [X_test_bind[-1],X_tests[i]],
                 ignore_index=True)
