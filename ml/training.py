@@ -1,16 +1,13 @@
 from sklearn.metrics import mean_squared_error
 import math
 import numpy as np
-from sklearn.preprocessing import LabelEncoder
-from sklearn.linear_model import ElasticNet, Lasso,  BayesianRidge, LassoLarsIC, LinearRegression
+from sklearn.linear_model import ElasticNet, Lasso,  BayesianRidge, LinearRegression
 from sklearn.ensemble import RandomForestRegressor,  GradientBoostingRegressor
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import RobustScaler
-from sklearn.base import BaseEstimator, TransformerMixin, RegressorMixin, clone
-from sklearn.model_selection import KFold, cross_val_score, train_test_split
 from sklearn.metrics import mean_squared_error
 import xgboost as xgb
-import lightgbm as lgb
+# import lightgbm as lgb
 
 def train_baseline(X_train, y_train, X_test, y_test):
     y_pred = 0
@@ -35,36 +32,47 @@ def define_models():
     models['linear'] = linear
 
     ## Lasso
-    alpha = [0.1, 0.2, 0.4, 0.7, 1, 2, 4, 8, 16]
+    alpha = [0.1, 0.2, 0.4, 0.7, 1, 16, 32, 64, 128, 256, 512]
     for a in alpha:
         lasso = make_pipeline(RobustScaler(), Lasso(random_state=1, alpha=a))
         models['lasso, alpha={a}'.format(a=a)] = lasso
 
     ## Elastic Net
     ENet = make_pipeline(RobustScaler(), ElasticNet(random_state=1))
+    models['Elastic Net'] = ENet
 
     ## Bayesian Ridge
     bayesian = make_pipeline(RobustScaler(), BayesianRidge())
+    models['Bayesian Ridge'] = bayesian
 
-    # ## Random Forest
-    # max_depth = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
-    # min_samples_split = [2]# 4, 8, 16, 32, 64, 128, 256, 512]
-    # min_samples_leaf = [0, 1]#, 2, 4, 8, 16, 32, 64, 128, 256, 512]
-    # for d in max_depth:
-    #     for s in min_samples_split:
-    #         for l in min_samples_leaf:
-    #             rf = RandomForestRegressor(random_state=1, max_depth=d, min_samples_split=s)
-    #             models['lasso, max_depth={d}, min_samples_split={s}, min_samples_leaf={l}'.format(d=d, s=s, l=l)] = rf
+    ## Random Forest
+    max_depth = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+    min_samples_split = [2, 4, 8, 16, 32, 64, 128, 256, 512]
+    min_samples_leaf = [0, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+    for d in max_depth:
+        for s in min_samples_split:
+            for l in min_samples_leaf:
+                rf = RandomForestRegressor(random_state=1, max_depth=d, min_samples_split=s)
+                models['lasso, max_depth={d}, min_samples_split={s}, min_samples_leaf={l}'.format(d=d, s=s, l=l)] = rf
 
     ## Gradient Boost
-
-    learning_rate = [0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100]
+    learning_rate = [0.00001, 0.0001, 0.001, 0.01, 0.1, 1]
     for l in learning_rate:
         GBoost = GradientBoostingRegressor(random_state=1, learning_rate=l)
         models['Gradient Boosting, lr={l}'.format(l=l)] = GBoost
 
-    model_xgb = xgb.XGBRegressor(random_state =1)
-    model_lgb = lgb.LGBMRegressor(objective='regression')
+    ## XG Boost
+    eta = [0, 0.3, 0.66, 1]
+    gamma = [0, 0.1, 4, 16, 64]
+    max_depth = [1, 4, 16, 64, 256]
+    min_child_weight = [0, 0.1, 4, 16, 64]
+    for e in eta:
+        for g in gamma:
+            for d in max_depth:
+                for c in min_child_weight:
+                    model_xgb = xgb.XGBRegressor(random_state=1, eta=e, gamma=g, max_depth=d, min_child_weight=c)
+                    models['XG Boost, eta={e}, gamma={g}, max_depth={d}, min_child_weight={c}'.format(e,g,d,c)] = model_xgb
+
 
     return models
 
@@ -96,4 +104,4 @@ def train(datalist):
             rmse[i,0] = train_baseline(X_trains[i], y_trains[i], X_tests[i], y_tests[i])
             scores, models = train_pipeline(X_trains[i], y_trains[i], X_tests[i], y_tests[i], models)
             rmse[i,1:len(scores)+1] = scores
-    return rmse, list(models.keys())
+    return rmse, ['baseline'] + list(models.keys())
