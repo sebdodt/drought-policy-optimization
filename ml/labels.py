@@ -2,6 +2,7 @@ import pandas as pd
 import addfips
 
 def read_data():
+    print(" > Reading in data for labels...")
     # read in features and label data
     supply_path = 'data/supply.xlsx'
     supply = pd.read_excel(supply_path)
@@ -9,6 +10,7 @@ def read_data():
 
 
 def data_cleaning(supply):
+    print(" > Cleaning label data...")
     # create column that counts the months since January 2014
     supply['month'] = supply['Reporting Month'].dt.month
     supply['year'] = supply['Reporting Month'].dt.year
@@ -40,6 +42,7 @@ def label_construction(supply):
     Our label is the sum of water production in the 12 months following the current month.
     (The current month is not included in the sum.)
     '''
+    print(" > Constructing labels...")
     # There are multiple producers for water in each county.
     # We will sum them up per month and per county.
     supply_sum = supply \
@@ -70,6 +73,7 @@ def match_counties(df):
     '''
     This function matches the county name to the FIPS code.
     '''
+    print(" > Match counties to FIPS codes...")
     # initialise values
     state = "CA"
     af = addfips.AddFIPS()

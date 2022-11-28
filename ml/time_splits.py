@@ -9,6 +9,7 @@ def convert_date_to_period(date):
     return months_since_jan_2014
 
 def determine_splits(config):
+    print(" > Determining time splits...")
     time_config = config['temporal_config']
 
     feature_start = convert_date_to_period(time_config['feature_start_time'])
@@ -74,6 +75,7 @@ def determine_splits(config):
 
 
 def generating_splits(split_df, df, labels):
+    print(" > Generating splits...")
     df = df.merge(labels, on=['fips', 'period'], how='left')
 
     X_trains = []
@@ -110,6 +112,7 @@ def split_data(features, labels):
 
 
 def rbind_df(validation_sets_eng):
+    print(" > Binding tables together...")
     X_trains, y_trains, X_tests, y_tests, groups = validation_sets_eng
     X_train_bind = [X_trains[0]]
     y_train_bind = [y_trains[0]]

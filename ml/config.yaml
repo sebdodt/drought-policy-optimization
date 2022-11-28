@@ -7,13 +7,13 @@ temporal_config:
     # reasoning: data going back the past 10 years, much of the data gets better around 2000
     label_end_time: '2022-10-01' # day AFTER last label date (all dates in any model are < this date)
     # reasoning: last booking_date in jocojimsinmatedata
-    model_update_frequency: 4 # in months # how frequently to retrain models
+    model_update_frequency: 12 # in months # how frequently to retrain models
     # reasoning: the model does not need to be retrained every month; cohorts don't change much
-    training_as_of_date_frequencies: 4 # in months  # time between as of dates for same entity in train matrix
+    training_as_of_date_frequencies: 1 # in months  # time between as of dates for same entity in train matrix
     # reasoning: Kit's input
     # test_as_of_date_frequencies: 1 # in months # time between as of dates for same entity in test matrix
     # # reasoning: Ryan
-    max_training_histories: 36 # in months # length of time included in a train matrix
+    max_training_histories: 24 # in months # length of time included in a train matrix
     # reasoning: assumption is that the most useful examples to use to predict next years recidivism are those who offended within the last 5 years
     # test_durations: 0 # in months # length of time included in a test matrix (0 days will give a single prediction immediately after training end)
     # # reasoning: we train the model right when we want to use it

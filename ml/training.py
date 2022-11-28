@@ -1,6 +1,7 @@
 from sklearn.metrics import mean_squared_error
 import math
 import numpy as np
+import pandas as pd
 from sklearn.linear_model import ElasticNet, Lasso,  BayesianRidge, LinearRegression
 from sklearn.ensemble import RandomForestRegressor,  GradientBoostingRegressor
 from sklearn.pipeline import make_pipeline
@@ -10,7 +11,7 @@ import xgboost as xgb
 # import lightgbm as lgb
 
 def train_baseline(X_train, y_train, X_test, y_test):
-    y_pred = 0
+    y_pred = y_train['y'].mean()
     y_test = np.array(y_test['y'])
     y_test = y_test[~np.isnan(y_test)]
     mse = mean_squared_error(y_test, [y_pred]*len(y_test))
@@ -25,6 +26,7 @@ def score_cv(model, X_train, y_train, X_test, y_test):
 
 
 def define_models():
+    print(" > Defining models to train...")
     models = dict()
 
     ## Linear
@@ -53,7 +55,7 @@ def define_models():
         for s in min_samples_split:
             for l in min_samples_leaf:
                 rf = RandomForestRegressor(random_state=1, max_depth=d, min_samples_split=s)
-                models['lasso, max_depth={d}, min_samples_split={s}, min_samples_leaf={l}'.format(d=d, s=s, l=l)] = rf
+                models['Random Forest, max_depth={d}, min_samples_split={s}, min_samples_leaf={l}'.format(d=d, s=s, l=l)] = rf
 
     ## Gradient Boost
     learning_rate = [0.00001, 0.0001, 0.001, 0.01, 0.1, 1]
@@ -71,14 +73,13 @@ def define_models():
             for d in max_depth:
                 for c in min_child_weight:
                     model_xgb = xgb.XGBRegressor(random_state=1, eta=e, gamma=g, max_depth=d, min_child_weight=c)
-                    models['XG Boost, eta={e}, gamma={g}, max_depth={d}, min_child_weight={c}'.format(e,g,d,c)] = model_xgb
+                    models['XG Boost, eta={e}, gamma={g}, max_depth={d}, min_child_weight={c}'.format(e=e,g=g,d=d,c=c)] = model_xgb
 
 
     return models
 
 
 def train_pipeline(X_train, y_train, X_test, y_test, models):
-
     # prepare models
     y_train = np.array(y_train['y'])
     y_test = np.array(y_test['y'])
@@ -92,16 +93,21 @@ def train_pipeline(X_train, y_train, X_test, y_test, models):
 
 
 def train(datalist):
-    print("Start training...")
+    print(" > Start training...")
     X_trains, y_trains, X_tests, y_tests, groups = datalist
 
     models = define_models()
 
     n_models = len(models.keys())
     rmse = np.zeros((len(X_trains),n_models+1))
+    i = 0
     for i in range(len(X_trains)):
         if (len(X_trains[i])!=0) & (len(X_tests[i])!=0):
             rmse[i,0] = train_baseline(X_trains[i], y_trains[i], X_tests[i], y_tests[i])
             scores, models = train_pipeline(X_trains[i], y_trains[i], X_tests[i], y_tests[i], models)
             rmse[i,1:len(scores)+1] = scores
+            i+=1
+            print(" > Finished time split {i}/6.".format(i=i))
+            print(scores)
+    print(" > Training finished.")
     return rmse, ['baseline'] + list(models.keys())

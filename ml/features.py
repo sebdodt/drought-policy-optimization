@@ -2,6 +2,7 @@ import pandas as pd
 import addfips
 
 def read_data():
+    print(" > Reading in features...")
     # read in features and label data
     path = 'data/weather_data.csv'
     df = pd.read_csv(path)
@@ -22,6 +23,7 @@ def read_data():
 
 
 def na_imputation(X_trains_eng, y_trains, X_tests_eng, y_tests):
+    print(" > Imputing missing values...")
     X_trains_new = []
     y_trains_new = []
     X_tests_new = []
@@ -42,6 +44,7 @@ def na_imputation(X_trains_eng, y_trains, X_tests_eng, y_tests):
 
 
 def generate_features(datalist):
+    print(" > Generating features...")
     X_trains, y_trains, X_tests, y_tests, groups = datalist
 
     X_trains_eng = []
@@ -58,7 +61,7 @@ def generate_features(datalist):
             'feelslikemin', 'feelslike', 'dew', 'humidity', 'precip', 'precipprob',
             'precipcover', 'snow', 'snowdepth',
             'windspeed', 'winddir', 'cloudcover', 
-            'solarradiation', 'solarenergy', 'uvindex' #'sealevelpressure', 'visibility'
+            'solarradiation', 'solarenergy', 'uvindex', 'sum_current_year' #'sealevelpressure', 'visibility'
         ]
         categorical = [
             'conditions', 'icon', 'preciptype'
