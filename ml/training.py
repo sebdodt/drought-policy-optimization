@@ -83,8 +83,9 @@ def train_pipeline(X_train, y_train, X_test, y_test, models):
     # prepare models
     y_train = np.array(y_train['y'])
     y_test = np.array(y_test['y'])
-    X_train = np.array(X_train.drop('fips', axis=1))
-    X_test = np.array(X_test.drop('fips', axis=1))
+    X_train = np.array(X_train) 
+    X_test = np.array(X_test) 
+    ## TODO Seb: one-hot encoding for fips, and feature for year
 
     scores = []
     for m in models.keys():

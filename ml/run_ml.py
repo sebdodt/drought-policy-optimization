@@ -15,12 +15,12 @@ validation_sets_bound = time_splits.rbind_df(validation_sets_eng)
 
 # model training
 rmse, models = training.train(validation_sets_bound)
-print(rmse)
-print(rmse.mean(axis=0))
+# print(rmse)
+# print(rmse.mean(axis=0))
 
-for i in range(len(rmse.mean(axis=0))):
-    print(models[i])
-    print(rmse.mean(axis=0)[i])
+# for i in range(len(rmse.mean(axis=0))):
+#     print(models[i])
+#     print(rmse.mean(axis=0)[i])
 
 print("The best model is:")
 print(models[np.argmin(rmse.mean(axis=0))])

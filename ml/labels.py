@@ -35,7 +35,7 @@ def data_cleaning(supply):
     return supply
 
 
-def label_construction(supply):
+def label_construction(supply): ## TODO Seb: test label "per capita water production"
     '''
     Function that constructs the labels based on our dataset.
 
