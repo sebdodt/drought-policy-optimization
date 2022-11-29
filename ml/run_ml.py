@@ -1,4 +1,5 @@
 import labels, features, time_splits, training
+import numpy as np
 
 # labels
 supply = labels.read_data()
@@ -20,4 +21,8 @@ print(rmse.mean(axis=0))
 for i in range(len(rmse.mean(axis=0))):
     print(models[i])
     print(rmse.mean(axis=0)[i])
+
+print("The best model is:")
+print(models[np.argmin(rmse.mean(axis=0))])
+print(rmse.mean(axis=0)[np.argmin(rmse.mean(axis=0))])
 print("Done.")
