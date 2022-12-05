@@ -46,7 +46,7 @@ def label_construction(supply): ## TODO Seb: test label "per capita water produc
     # There are multiple producers for water in each county.
     # We will sum them up per month and per county.
     supply_sum = supply \
-        .groupby(['County', 'period'])['production'] \
+        .groupby(['County', 'period'])[['production','Total Population Served']] \
         .sum() \
         .reset_index()
 
@@ -57,8 +57,15 @@ def label_construction(supply): ## TODO Seb: test label "per capita water produc
     # We are shifting the data to get the sum of production for the upcoming 12 months excluding the current month
     supply_sum['sum_next_year'] = supply_sum.groupby(['County'])['sum_current_year'].shift(-12)
     
-    # We calculate the percentage change and call it `y`
-    supply_sum['y'] = (supply_sum['sum_next_year'] - supply_sum['sum_current_year']) / supply_sum['sum_current_year']
+    # # We calculate the percentage change and call it `y`
+    # supply_sum['y'] = (supply_sum['sum_next_year'] - supply_sum['sum_current_year']) / supply_sum['sum_current_year']
+
+    # We calculate how many people are served
+    supply_sum['served_current_year'] = supply_sum.groupby('County')['Total Population Served'].rolling(12).mean().reset_index(0,drop=True)
+    supply_sum['served_next_year'] = supply_sum.groupby(['County'])['served_current_year'].shift(-12)
+
+    # We calculate the per capita production
+    supply_sum['y'] = supply_sum['sum_next_year'] / supply_sum['served_next_year']
     
     # Drop next year sum as it isn't needed
     supply_sum.drop(

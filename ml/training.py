@@ -34,10 +34,10 @@ def define_models():
     models['linear'] = linear
 
     ## Lasso
-    alpha = [0.1, 0.2, 0.4, 0.7, 1, 16, 32, 64, 128, 256, 512]
-    for a in alpha:
-        lasso = make_pipeline(RobustScaler(), Lasso(random_state=1, alpha=a))
-        models['lasso, alpha={a}'.format(a=a)] = lasso
+    # alpha = [0.1, 0.2, 0.4, 0.7, 1, 16, 24, 32, 40, 52, 64, 128, 256, 512]
+    # for a in alpha:
+    #     lasso = make_pipeline(RobustScaler(), Lasso(random_state=1, alpha=a))
+    #     models['lasso, alpha={a}'.format(a=a)] = lasso
 
     ## Elastic Net
     ENet = make_pipeline(RobustScaler(), ElasticNet(random_state=1))
@@ -93,7 +93,7 @@ def train_pipeline(X_train, y_train, X_test, y_test, models):
     return scores, models
 
 
-def train(datalist):
+def train(datalist, big_grid):
     print(" > Start training...")
     X_trains, y_trains, X_tests, y_tests, groups = datalist
 
@@ -110,4 +110,4 @@ def train(datalist):
             i+=1
             print(" > Finished time split {i}/6.".format(i=i))
     print(" > Training finished.")
-    return rmse, ['baseline'] + list(models.keys())
+    return rmse, ['baseline'] + list(models.keys()), models

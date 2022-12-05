@@ -34,7 +34,7 @@ def na_imputation(X_trains_eng, y_trains, X_tests_eng, y_tests):
         X_tests_eng[i].reset_index(drop=True, inplace=True)
         y_tests[i].reset_index(drop=True, inplace=True)
 
-        X_trains_new.append(X_trains_eng[i].loc[~y_trains[i]['y'].isna(),:])
+        X_trains_new.append(X_trains_eng[i].loc[(~y_trains[i]['y'].isna()),:])
         y_trains_new.append(y_trains[i].loc[~y_trains[i]['y'].isna(),:])
         X_tests_new.append(X_tests_eng[i].loc[~y_tests[i]['y'].isna(),:])
         y_tests_new.append(y_tests[i].loc[~y_tests[i]['y'].isna(),:])
@@ -43,7 +43,7 @@ def na_imputation(X_trains_eng, y_trains, X_tests_eng, y_tests):
 
 
 
-def generate_features(datalist):
+def generate_features(datalist, prediction=False):
     print(" > Generating features...")
     X_trains, y_trains, X_tests, y_tests, groups = datalist
 
@@ -61,7 +61,7 @@ def generate_features(datalist):
             'feelslikemin', 'feelslike', 'dew', 'humidity', 'precip', 'precipprob',
             'precipcover', 'snow', 'snowdepth',
             'windspeed', 'winddir', 'cloudcover', 
-            'solarradiation', 'solarenergy', 'uvindex', 'sum_current_year' #'sealevelpressure', 'visibility'
+            'solarradiation', 'solarenergy', 'uvindex' #, 'sum_current_year' #'sealevelpressure', 'visibility'
         ]
         categorical = [
             'conditions', 'icon', 'preciptype'
@@ -126,8 +126,9 @@ def generate_features(datalist):
                 X_tests_eng.append(train)
             else:
                 raise ValueError
-    
-    X_trains_eng, y_trains, X_tests_eng, y_tests = na_imputation(X_trains_eng, y_trains, X_tests_eng, y_tests)
+
+    if not prediction:
+        X_trains_eng, y_trains, X_tests_eng, y_tests = na_imputation(X_trains_eng, y_trains, X_tests_eng, y_tests)
             
     return X_trains_eng, y_trains, X_tests_eng, y_tests, groups
     
