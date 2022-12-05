@@ -23,7 +23,7 @@ def generate_scenario(population_size):
     current_cost_per_af = yearly_cost/yearly_use_af
 
     # other assumptions
-    part_of_use_that_is_fixed = 2/3
+    part_of_use_that_is_fixed = 2/3 # https://www.google.com/search?q=water+usage+by+income&client=safari&rls=en&sxsrf=ALiCzsbcJZmmS70aTZQlw8zcg9E0IwfbUA:1670270330064&source=lnms&tbm=isch&sa=X&ved=2ahUKEwiI7M7toeP7AhVXmHIEHRW1CE8Q_AUoAXoECAEQAw&biw=1440&bih=812&dpr=2#imgrc=g1km3zfEH6yM7M
 
     # generate individuals
     income = np.random.lognormal(mean=np.log(median_income), sigma=sigma_income, size=population)    # https://statisticsbyjim.com/probability/global-income-distributions/
@@ -80,5 +80,6 @@ if __name__=='__main__':
     population_df = simulate_demand(population_df, price1, price2, threshold)
     print(""" > In this scenario, {a} acre-feet of water are available. {u} acre-feet were used.""".format(a=round(total_available), u=round(population_df['total_used'].sum())))
     
+    # print(population_df)
     # print(population_df) # this table shows each individual in the town per row, and their water use and expenditures at our price level.
     # (`Current use` and `Current cost` refer to how much they are currently using -- before our intervention)
