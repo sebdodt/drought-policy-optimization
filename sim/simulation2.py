@@ -80,9 +80,9 @@ if __name__=='__main__':
     population_size = 5000
     total_available = 0.4124291510893835 * population_size # given by Seb's ML pipeline
     
-    thresholds = np.arange(0,5,0.1)
-    price_1_list = range(1000, 4000,50)
-    price_2_list = range(1000, 4000,50)
+    thresholds = np.arange(0,10,0.005)
+    price_1_list = range(1000, 4000,100)
+    price_2_list = range(1000, 4000,100)
 
     # metrics
     total_costs = []            # total money spent on water by everyone
@@ -92,6 +92,10 @@ if __name__=='__main__':
     proportion_of_water_used_by_bottom_quintile = []
     variance_of_water_use = []  # proxy for inequality
     proportion_of_lower_price_water_used_by_bottom_quintile = []
+    per_gallon_price_bottom_quintile = []
+    per_gallon_price_top_quintile = []
+    total_use_top_quintile = []
+    total_use_bottom_quintile = []
     total_use = []
     feasible = [] 
     p1 = []
@@ -114,11 +118,16 @@ if __name__=='__main__':
                     total_proportion_used.append(outcome["used_at_lower_price"].sum()/outcome["total_used"].sum())
                     total_costs.append(outcome["total_spent"].sum())
                     total_use.append(outcome["total_used"].sum())
+                    total_use_top_quintile.append(outcome.loc[outcome['income_quintile'] == 5,"total_used"].sum())
+                    total_use_bottom_quintile.append(outcome.loc[outcome['income_quintile'] == 1,"total_used"].sum())
                     total_water_use_by_bottom_quintile.append(outcome.loc[outcome['income_quintile'] == 1, "total_used"].sum())
                     total_cost_for_bottom_quintile.append(outcome.loc[outcome['income_quintile'] == 1, "total_spent"].sum())
                     proportion_of_water_used_by_bottom_quintile.append(outcome.loc[outcome['income_quintile'] == 1, "total_used"].sum()/outcome["total_used"].sum())
                     proportion_of_lower_price_water_used_by_bottom_quintile.append(outcome.loc[outcome['income_quintile'] == 1, "total_used"].sum()/(0.001+outcome["used_at_lower_price"].sum()))
                     variance_of_water_use.append(outcome['total_used'].var())
+                    per_gallon_price_bottom_quintile.append(outcome.loc[outcome['income_quintile'] == 1, "total_spent"].sum()/outcome.loc[outcome['income_quintile'] == 1, "total_used"].sum())
+                    per_gallon_price_top_quintile.append(outcome.loc[outcome['income_quintile'] == 5, "total_spent"].sum()/outcome.loc[outcome['income_quintile'] == 1, "total_used"].sum())
+
 
                     # information about the scenario
                     p1.append(price1)
@@ -133,16 +142,22 @@ if __name__=='__main__':
         'total_proportion_used': total_proportion_used,
         'total_costs': total_costs,
         'total_use': total_use,
+        'total_use_top_quintile': total_use_top_quintile,
+        'total_use_bottom_quintile': total_use_bottom_quintile,
         'total_water_use_by_bottom_quintile': total_water_use_by_bottom_quintile,
         'total_cost_for_bottom_quintile': total_cost_for_bottom_quintile,
         'proportion_of_water_used_by_bottom_quintile': proportion_of_water_used_by_bottom_quintile,
         'proportion_of_lower_price_water_used_by_bottom_quintile': proportion_of_lower_price_water_used_by_bottom_quintile,
         'variance_of_water_use': variance_of_water_use,
+        'per_gallon_price_bottom_quintile': per_gallon_price_bottom_quintile,
+        'per_gallon_price_top_quintile': per_gallon_price_top_quintile,
         'price1': p1,
         'price2': p2,
         'threshold': t
     })              
     metrics['perc_spent_by_bottom_quintile'] = metrics['total_cost_for_bottom_quintile'] / metrics['total_costs']
+    metrics['prop_bottom_used_compared_to_top'] = metrics['total_use_bottom_quintile'] / metrics['total_use_top_quintile']
+    metrics['prop_per_gallon_price'] = metrics['per_gallon_price_bottom_quintile'] / metrics['per_gallon_price_top_quintile']
 
 
     print(" > Exporting plots...")
@@ -218,9 +233,19 @@ if __name__=='__main__':
 
     # ## Sebs
     # metrics['perc_spent_by_bottom_quintile'] = metrics['total_cost_for_bottom_quintile'] / metrics['total_costs']
-    # sns.scatterplot(metrics, x='total_costs', y='perc_spent_by_bottom_quintile', hue='total_use')
-    # plt.savefig('perc_spent_by_bottom_quintile.png')
-    # plt.clf()
+    sns.scatterplot(metrics, x='total_costs', y='per_gallon_price_bottom_quintile', hue='total_use')
+    plt.savefig('per_gallon_price_bottom_quintile.png')
+    plt.clf()
+
+
+    sns.scatterplot(metrics, x='total_costs', y='prop_bottom_used_compared_to_top', hue='total_use')
+    plt.savefig('prop_bottom_used_compared_to_top.png')
+    plt.clf()
+    
+    
+    sns.scatterplot(metrics, x='total_costs', y='prop_per_gallon_price', hue='total_use')
+    plt.savefig('prop_per_gallon_price.png')
+    plt.clf()
 
     # sns.scatterplot(metrics, x='total_costs', y='total_proportion_used', hue='total_use')
     # plt.savefig('total_proportion_used.png')
