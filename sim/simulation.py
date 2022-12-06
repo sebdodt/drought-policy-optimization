@@ -77,9 +77,20 @@ if __name__=='__main__':
     threshold = 0.5      # in acre-feet per year
 
     population_df = generate_scenario(population_size)
-    population_df = simulate_demand(population_df, price1, price2, threshold)
-    print(""" > In this scenario, {a} acre-feet of water are available. {u} acre-feet were used.""".format(a=round(total_available), u=round(population_df['total_used'].sum())))
-    
+    simulation_outcome = simulate_demand(population_df, price1, price2, threshold)
+    print(""" > In this scenario, {a} acre-feet of water are available. {u} acre-feet were used."""
+        .format(a=round(total_available), u=round(population_df['total_used'].sum())))
+
+
+    ## metrics
+
+    # total cost to population
+    simulation_outcome['total_spent'].sum()
+
+    # total cost to bottom 50%
+    simulation_outcome[]
+
+
     # print(population_df)
     # print(population_df) # this table shows each individual in the town per row, and their water use and expenditures at our price level.
     # (`Current use` and `Current cost` refer to how much they are currently using -- before our intervention)

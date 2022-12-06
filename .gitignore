@@ -136,3 +136,4 @@ data/
 *playground.py
 *playground.ipynb
 *.DS_Store
+*.png

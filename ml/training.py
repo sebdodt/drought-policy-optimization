@@ -48,14 +48,14 @@ def define_models():
     models['Bayesian Ridge'] = bayesian
 
     # ## Random Forest
-    # max_depth = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
-    # min_samples_split = [2, 4, 8, 16, 32, 64, 128, 256, 512]
-    # min_samples_leaf = [0, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
-    # for d in max_depth:
-    #     for s in min_samples_split:
-    #         for l in min_samples_leaf:
-    #             rf = RandomForestRegressor(random_state=1, max_depth=d, min_samples_split=s)
-    #             models['Random Forest, max_depth={d}, min_samples_split={s}, min_samples_leaf={l}'.format(d=d, s=s, l=l)] = rf
+    max_depth = [1, 2, 4, 8 ]#, 16, 32, 64, 128, 256, 512]
+    min_samples_split = [2, 4, 8, 16] #, 32, 64, 128, 256, 512]
+    min_samples_leaf = [0, 1, 2, 4, 8, 16] #, 32, 64, 128, 256, 512]
+    for d in max_depth:
+        for s in min_samples_split:
+            for l in min_samples_leaf:
+                rf = RandomForestRegressor(random_state=1, max_depth=d, min_samples_split=s)
+                models['Random Forest, max_depth={d}, min_samples_split={s}, min_samples_leaf={l}'.format(d=d, s=s, l=l)] = rf
 
     # ## Gradient Boost
     # learning_rate = [0.0000001, 0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1, 1]
