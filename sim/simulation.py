@@ -88,7 +88,6 @@ if __name__=='__main__':
     simulation_outcome['total_spent'].sum()
 
     # total cost to bottom 50%
-    simulation_outcome[]
 
 
     # print(population_df)

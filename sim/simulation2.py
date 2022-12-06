@@ -77,10 +77,10 @@ def simulate_demand(population_df, price1, price2, threshold):
 
 
 if __name__=='__main__':
-    population_size = 10000
+    population_size = 5000
     total_available = 0.4124291510893835 * population_size # given by Seb's ML pipeline
     
-    thresholds = np.arange(0,15,0.1)
+    thresholds = np.arange(0,5,0.1)
     price_1_list = range(1000, 4000,50)
     price_2_list = range(1000, 4000,50)
 
