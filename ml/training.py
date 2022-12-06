@@ -34,10 +34,10 @@ def define_models():
     models['linear'] = linear
 
     ## Lasso
-    # alpha = [0.1, 0.2, 0.4, 0.7, 1, 16, 24, 32, 40, 52, 64, 128, 256, 512]
-    # for a in alpha:
-    #     lasso = make_pipeline(RobustScaler(), Lasso(random_state=1, alpha=a))
-    #     models['lasso, alpha={a}'.format(a=a)] = lasso
+    alpha = [0.1, 0.2, 0.4, 0.7, 1, 16, 24, 32, 40, 52, 64, 128, 256, 512]
+    for a in alpha:
+        lasso = make_pipeline(RobustScaler(), Lasso(random_state=1, alpha=a))
+        models['lasso, alpha={a}'.format(a=a)] = lasso
 
     ## Elastic Net
     ENet = make_pipeline(RobustScaler(), ElasticNet(random_state=1))
@@ -48,13 +48,13 @@ def define_models():
     models['Bayesian Ridge'] = bayesian
 
     # ## Random Forest
-    max_depth = [1, 2, 4, 8 ]#, 16, 32, 64, 128, 256, 512]
-    min_samples_split = [2, 4, 8, 16] #, 32, 64, 128, 256, 512]
-    min_samples_leaf = [0, 1, 2, 4, 8, 16] #, 32, 64, 128, 256, 512]
+    max_depth = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+    min_samples_split = [2, 4, 8, 16, 32, 64, 128, 256, 512]
+    min_samples_leaf = [300]
     for d in max_depth:
         for s in min_samples_split:
             for l in min_samples_leaf:
-                rf = RandomForestRegressor(random_state=1, max_depth=d, min_samples_split=s)
+                rf = RandomForestRegressor(random_state=1, max_depth=d, min_samples_split=s, n_estimators=1000, n_jobs=4)
                 models['Random Forest, max_depth={d}, min_samples_split={s}, min_samples_leaf={l}'.format(d=d, s=s, l=l)] = rf
 
     # ## Gradient Boost
@@ -63,17 +63,17 @@ def define_models():
     #     GBoost = GradientBoostingRegressor(random_state=1, learning_rate=l)
     #     models['Gradient Boosting, lr={l}'.format(l=l)] = GBoost
 
-    ## XG Boost
-    eta = [1] # [0, 0.3, 0.66, 1]
-    gamma = [4] # [0, 0.1, 4, 16, 64]
-    max_depth = [4,256] # [1, 4, 16, 64, 256]
-    min_child_weight = [0,0.1] # [0, 0.1, 4, 16, 64]
-    for e in eta:
-        for g in gamma:
-            for d in max_depth:
-                for c in min_child_weight:
-                    model_xgb = xgb.XGBRegressor(random_state=1, eta=e, gamma=g, max_depth=d, min_child_weight=c)
-                    models['XG Boost, eta={e}, gamma={g}, max_depth={d}, min_child_weight={c}'.format(e=e,g=g,d=d,c=c)] = model_xgb
+    # ## XG Boost
+    # eta = [1] # [0, 0.3, 0.66, 1]
+    # gamma = [4] # [0, 0.1, 4, 16, 64]
+    # max_depth = [4,256] # [1, 4, 16, 64, 256]
+    # min_child_weight = [0,0.1] # [0, 0.1, 4, 16, 64]
+    # for e in eta:
+    #     for g in gamma:
+    #         for d in max_depth:
+    #             for c in min_child_weight:
+    #                 model_xgb = xgb.XGBRegressor(random_state=1, eta=e, gamma=g, max_depth=d, min_child_weight=c)
+    #                 models['XG Boost, eta={e}, gamma={g}, max_depth={d}, min_child_weight={c}'.format(e=e,g=g,d=d,c=c)] = model_xgb
 
 
     return models

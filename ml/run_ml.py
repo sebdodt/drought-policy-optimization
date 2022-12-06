@@ -22,6 +22,8 @@ rmse, model_names, models = training.train(validation_sets_bound, big_grid)
 #     print(models[i])
 #     print(rmse.mean(axis=0)[i])
 
+pd.DataFrame(rmse,columns=model_names).to_csv('ml_output.csv')
+
 # model selection
 best_model = model_names[np.argmin(rmse.mean(axis=0))]
 print(" > The best model is: ", best_model)

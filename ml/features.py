@@ -1,5 +1,6 @@
 import pandas as pd
 import addfips
+import numpy as np
 
 def read_data():
     print(" > Reading in features...")
@@ -17,6 +18,11 @@ def read_data():
     df.rename({'name': 'fips'}, axis=1, inplace=True)
     # df['fips'] = df['fips'].astype(int)
     df.drop(['sealevelpressure', 'visibility'], axis=1, inplace=True)
+
+    # print(df)
+    # fips = pd.get_dummies(df.fips, prefix='fips')
+    # df = df.join(fips)
+    # print(df)
 
     return df
     
@@ -119,6 +125,9 @@ def generate_features(datalist, prediction=False):
             train = train.merge(min_monthly, on=['fips'], how='left')
             for var in continuous:
                 train.rename({var:'min_'+var}, axis=1, inplace=True)
+
+            fips = pd.get_dummies(train.fips, prefix='fips')
+            train = train.join(fips)
 
             if j == 'train':
                 X_trains_eng.append(train)
