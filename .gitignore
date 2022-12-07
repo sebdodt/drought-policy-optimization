@@ -137,3 +137,4 @@ data/
 *playground.ipynb
 *.DS_Store
 *.png
+*.csv
