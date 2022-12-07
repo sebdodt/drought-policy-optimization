@@ -109,5 +109,7 @@ def train(datalist, big_grid):
             rmse[i,1:len(scores)+1] = scores
             i+=1
             print(" > Finished time split {i}/6.".format(i=i))
+            # X_trains[i-1].to_csv('eda/last_train_split.csv')
+            # y_trains[i-1].to_csv('eda/last_label.csv')
     print(" > Training finished.")
     return rmse, ['baseline'] + list(models.keys()), models

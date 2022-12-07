@@ -2,6 +2,9 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+sns.set_style('white')
+sns.set_context("paper", font_scale = 1.2)
+color = sns.color_palette("tab10", 10)[0]
 
 def generate_scenario(population_size):
     '''
@@ -80,7 +83,7 @@ if __name__=='__main__':
     population_size = 5000
     total_available = 0.4124291510893835 * population_size # given by Seb's ML pipeline
     
-    thresholds = np.arange(0,10,0.005)
+    thresholds = np.arange(0,10,0.5)
     price_1_list = range(1000, 4000,100)
     price_2_list = range(1000, 4000,100)
 
@@ -162,16 +165,19 @@ if __name__=='__main__':
 
     print(" > Exporting plots...")
     print(" > Plot 1: What are the different simulations (demand curve)? Which of them are feasible?")
-
+    metrics['total_costs'] /= 1000000
     sns.scatterplot(metrics, x = "total_costs", y = "total_use", hue = "feasible")
-    plt.savefig('1-all_scenarios.png')
+    plt.title('All scenarios')
+    plt.xlabel('Total amount spent on water by population (in million USD)')
+    plt.ylabel('Total amount used by population (in acre-feet)')
+    plt.savefig('1-all_scenarios.png',dpi=600)
     plt.clf()
 
 
     print(" > Plot 2a: What is our menu of options? (equity vs. economic damage)")
     metrics_of_feasible = metrics.loc[metrics['feasible']==True]
     sns.scatterplot(metrics_of_feasible, x='total_costs', y='perc_spent_by_bottom_quintile', hue='total_use')
-    plt.savefig('2a-equity-vs-economy.png')
+    plt.savefig('2a-equity-vs-economy.png',dpi=600)
     plt.clf()
 
     print(" > Plot2b: Menu of options with efficient frontier")
@@ -188,18 +194,21 @@ if __name__=='__main__':
         in_frontier.append(is_in_frontier(metrics_of_feasible,'total_costs', 'perc_spent_by_bottom_quintile', i))
     metrics_of_feasible['in_frontier'] = in_frontier
     sns.scatterplot(metrics_of_feasible, x='total_costs', y='perc_spent_by_bottom_quintile', hue='in_frontier')
-    plt.savefig('2b-test-frontier.png')
+    plt.title('Comparison 1')
+    plt.xlabel('Total cost for the population/economy')
+    plt.ylabel('Percentage of total water cost paid by bottom quintile')
+    plt.savefig('2b-frontier.png',dpi=600)
     plt.clf()
 
     print(" > Plot 3: Of all values in our efficient frontier, what are the prices for each?")
     metrics_in_frontier = metrics_of_feasible.loc[metrics_of_feasible['in_frontier']==1,:]
 
-    fig, axes = plt.subplots(3, 1, figsize=(9, 9))
-    sns.lineplot(ax=axes[0], data=metrics_in_frontier, x='total_costs', y='price1')
-    sns.lineplot(ax=axes[1], data=metrics_in_frontier, x='total_costs', y='price2')
-    sns.lineplot(ax=axes[2], data=metrics_in_frontier, x='total_costs', y='threshold')
-    plt.savefig('3-frontier-choices.png')
-    plt.clf()
+    # fig, axes = plt.subplots(3, 1, figsize=(9, 9))
+    # sns.lineplot(ax=axes[0], data=metrics_in_frontier, x='total_costs', y='price1')
+    # sns.lineplot(ax=axes[1], data=metrics_in_frontier, x='total_costs', y='price2')
+    # sns.lineplot(ax=axes[2], data=metrics_in_frontier, x='total_costs', y='threshold')
+    # plt.savefig('3-frontier-choices.png',dpi=600)
+    # plt.clf()
     # print(metrics)
 
 
@@ -234,17 +243,23 @@ if __name__=='__main__':
     # ## Sebs
     # metrics['perc_spent_by_bottom_quintile'] = metrics['total_cost_for_bottom_quintile'] / metrics['total_costs']
     sns.scatterplot(metrics, x='total_costs', y='per_gallon_price_bottom_quintile', hue='total_use')
-    plt.savefig('per_gallon_price_bottom_quintile.png')
+    plt.xlabel('Total cost for the population/economy')
+    plt.ylabel('Average water price for bottom quintile (in acre-feet/USD)')
+    plt.savefig('per_gallon_price_bottom_quintile.png',dpi=600)
     plt.clf()
 
 
     sns.scatterplot(metrics, x='total_costs', y='prop_bottom_used_compared_to_top', hue='total_use')
-    plt.savefig('prop_bottom_used_compared_to_top.png')
+    plt.xlabel('Total cost for the population/economy')
+    plt.ylabel('Proportion of water usage by bottom quintile compared to top quintile')
+    plt.savefig('prop_bottom_used_compared_to_top.png',dpi=600)
     plt.clf()
     
     
     sns.scatterplot(metrics, x='total_costs', y='prop_per_gallon_price', hue='total_use')
-    plt.savefig('prop_per_gallon_price.png')
+    plt.xlabel('Total cost for the population/economy')
+    plt.ylabel('Proportion of avg. water price for bottom vs. top quintile')
+    plt.savefig('prop_per_gallon_price.png',dpi=600)
     plt.clf()
 
     # sns.scatterplot(metrics, x='total_costs', y='total_proportion_used', hue='total_use')
