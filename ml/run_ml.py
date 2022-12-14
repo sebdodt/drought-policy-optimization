@@ -15,19 +15,13 @@ validation_sets_eng = features.generate_features(validation_sets)
 validation_sets_bound = time_splits.rbind_df(validation_sets_eng)
 
 # model training
-big_grid = True
-rmse, model_names, models = training.train(validation_sets_bound, big_grid)
-
-# for i in range(len(rmse.mean(axis=0))):
-#     print(models[i])
-#     print(rmse.mean(axis=0)[i])
-
+rmse, model_names, models = training.train(validation_sets_bound)
 pd.DataFrame(rmse,columns=model_names).to_csv('ml_output.csv')
 
 # model selection
 best_model = model_names[np.argmin(rmse.mean(axis=0))]
 print(" > The best model is: ", best_model)
-print(" > The RMSE error is: ", rmse.mean(axis=0)[np.argmin(rmse.mean(axis=0))])
+print(" > The test RMSE error is: ", rmse.mean(axis=0)[np.argmin(rmse.mean(axis=0))])
 print(" > (Baseline RMSE is {base})".format(base=rmse.mean(axis=0)[0]))
 
 # model predictions for upcoming 12 months

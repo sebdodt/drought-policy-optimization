@@ -1,23 +1,12 @@
 temporal_config:
-    min_training_histories: 12 # in months
-    feature_start_time: '2014-01-01' # earliest date included in features
+    
+    feature_start_time: '2014-01-01' # The first date at which we possess data from all of our sources
     feature_end_time: '2022-11-01'   # latest date included in features
-    # reasoning: latest date in jocojimsinmatecharges, inmatedata, and in jocojcmhcservices
     label_start_time: '2014-06-01' # earliest date for which labels are avialable
-    # reasoning: data going back the past 10 years, much of the data gets better around 2000
-    label_end_time: '2022-10-01' # day AFTER last label date (all dates in any model are < this date)
-    # reasoning: last booking_date in jocojimsinmatedata
-    model_update_frequency: 12 # in months # how frequently to retrain models
-    # reasoning: the model does not need to be retrained every month; cohorts don't change much
-    training_as_of_date_frequencies: 1 # in months  # time between as of dates for same entity in train matrix
-    # reasoning: Kit's input
-    # test_as_of_date_frequencies: 1 # in months # time between as of dates for same entity in test matrix
-    # # reasoning: Ryan
-    max_training_histories: 24 # in months # length of time included in a train matrix
-    # reasoning: assumption is that the most useful examples to use to predict next years recidivism are those who offended within the last 5 years
-    # test_durations: 0 # in months # length of time included in a test matrix (0 days will give a single prediction immediately after training end)
-    # # reasoning: we train the model right when we want to use it
+    label_end_time: '2022-10-01' # latest date included in label data that we have
+    model_update_frequency: 12 # in months # how frequently to retrain models. Our model is designed to be run every year
+    training_as_of_date_frequencies: 1 # in months  # time between cutoff dates in the training matrix
+    min_training_histories: 24 # in months # the minimum amount of history available at a cutoff date
+    max_training_histories: 36 # in months # length of time included in a train matrix
     training_label_timespans: 12 # in months # time period across which outcomes are labeled in train matrices
-    # reasoning: we want to know who will be incarcerated within the next year
     test_label_timespans: 12 # in months # time period across which outcomes are labeled in train matrices
-    # reasoning: we want to know who will be incarcerated within the next year

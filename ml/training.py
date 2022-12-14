@@ -36,7 +36,7 @@ def define_models():
     ## Lasso
     alpha = [0.7, 1, 16]
     for a in alpha:
-        lasso = make_pipeline(RobustScaler(), Lasso(random_state=1, alpha=a))
+        lasso = make_pipeline(RobustScaler(), Lasso(random_state=1, alpha=a, max_iter=10000, tol=0.001))
         models['lasso, alpha={a}'.format(a=a)] = lasso
 
     ## Elastic Net
@@ -47,17 +47,17 @@ def define_models():
     bayesian = make_pipeline(RobustScaler(), BayesianRidge())
     models['Bayesian Ridge'] = bayesian
 
-    # ## Random Forest
-    # max_depth = [1, 16, 64, 256, 512]
+    ## Random Forest
+    # max_depth = [1, 16, 64, 256]
     # min_samples_split = [2, 64]
     # min_samples_leaf = [2, 64]
     # for d in max_depth:
     #     for s in min_samples_split:
     #         for l in min_samples_leaf:
-    #             rf = RandomForestRegressor(random_state=1, max_depth=d, min_samples_split=s, n_estimators=2000, n_jobs=4)
+    #             rf = RandomForestRegressor(random_state=1, max_depth=d, min_samples_split=s, n_estimators=500, n_jobs=4)
     #             models['Random Forest, max_depth={d}, min_samples_split={s}, min_samples_leaf={l}'.format(d=d, s=s, l=l)] = rf
 
-    # ## Gradient Boost
+    ## Gradient Boost
     learning_rate = [0.0000001, 0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1, 1]
     for l in learning_rate:
         GBoost = GradientBoostingRegressor(random_state=1, learning_rate=l)
@@ -85,7 +85,6 @@ def train_pipeline(X_train, y_train, X_test, y_test, models):
     y_test = np.array(y_test['y'])
     X_train = np.array(X_train) 
     X_test = np.array(X_test) 
-    ## TODO Seb: one-hot encoding for fips, and feature for year
 
     scores = []
     for m in models.keys():
@@ -93,12 +92,11 @@ def train_pipeline(X_train, y_train, X_test, y_test, models):
     return scores, models
 
 
-def train(datalist, big_grid):
+def train(datalist):
     print(" > Start training...")
     X_trains, y_trains, X_tests, y_tests, groups = datalist
 
     models = define_models()
-
     n_models = len(models.keys())
     rmse = np.zeros((len(X_trains),n_models+1))
     i = 0
@@ -109,7 +107,5 @@ def train(datalist, big_grid):
             rmse[i,1:len(scores)+1] = scores
             i+=1
             print(" > Finished time split {i}/6.".format(i=i))
-            # X_trains[i-1].to_csv('eda/last_train_split.csv')
-            # y_trains[i-1].to_csv('eda/last_label.csv')
     print(" > Training finished.")
     return rmse, ['baseline'] + list(models.keys()), models

@@ -75,7 +75,7 @@ def generate_features(datalist, prediction=False):
         imputations = ['snow', 'snowdepth']
 
         
-        ## imputations
+        
         for j in ['train', 'test']:
             if j == 'train':
                 source = X_trains[i]
@@ -86,7 +86,7 @@ def generate_features(datalist, prediction=False):
             else:
                 raise ValueError
 
-
+            ## imputing 0 for missing values
             source[imputations] = source[imputations].fillna(0)
             
 
