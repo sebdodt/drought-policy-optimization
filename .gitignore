@@ -130,7 +130,8 @@ dmypy.json
 
 
 # data
-data/
+data/old
+data/checking
 
 # Sebs stuff
 *playground.py
