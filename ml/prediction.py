@@ -1,5 +1,5 @@
 import yaml
-import features
+from ml import features
 
 def create_features(feature_df):
     config_path = 'ml/config.yaml'

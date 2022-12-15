@@ -93,13 +93,13 @@ def train_pipeline(X_train, y_train, X_test, y_test, models):
 
 
 def train(datalist):
-    print(" > Start training...")
     X_trains, y_trains, X_tests, y_tests, groups = datalist
 
     models = define_models()
     n_models = len(models.keys())
     rmse = np.zeros((len(X_trains),n_models+1))
     i = 0
+    print(" > Start training...")
     for i in range(len(X_trains)):
         if (len(X_trains[i])!=0) & (len(X_tests[i])!=0):
             rmse[i,0] = train_baseline(X_trains[i], y_trains[i], X_tests[i], y_tests[i])

@@ -5,7 +5,7 @@ import numpy as np
 def read_data():
     print(" > Reading in features...")
     # read in features and label data
-    path = 'data/weather_data.csv'
+    path = 'data/weather.csv'
     df = pd.read_csv(path)
 
     # create column that counts the months since January 2014
@@ -16,13 +16,7 @@ def read_data():
 
     # rename fips column
     df.rename({'name': 'fips'}, axis=1, inplace=True)
-    # df['fips'] = df['fips'].astype(int)
     df.drop(['sealevelpressure', 'visibility'], axis=1, inplace=True)
-
-    # print(df)
-    # fips = pd.get_dummies(df.fips, prefix='fips')
-    # df = df.join(fips)
-    # print(df)
 
     return df
     
@@ -67,7 +61,7 @@ def generate_features(datalist, prediction=False):
             'feelslikemin', 'feelslike', 'dew', 'humidity', 'precip', 'precipprob',
             'precipcover', 'snow', 'snowdepth',
             'windspeed', 'winddir', 'cloudcover', 
-            'solarradiation', 'solarenergy', 'uvindex' #, 'sum_current_year' #'sealevelpressure', 'visibility'
+            'solarradiation', 'solarenergy', 'uvindex' 
         ]
         categorical = [
             'conditions', 'icon', 'preciptype'
