@@ -2,6 +2,9 @@ import yaml
 from ml import features
 
 def create_features(feature_df):
+    '''
+    Creates features over latest possible time split to predict water usage for the next 12 months
+    '''
     config_path = 'ml/config.yaml'
     with open(config_path, 'r') as dbf:
         config = yaml.safe_load(dbf)

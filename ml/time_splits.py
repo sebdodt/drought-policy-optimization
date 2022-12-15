@@ -4,6 +4,9 @@ import numpy as np
 
 
 def convert_date_to_period(date):
+    '''
+    Converts date into period. Period 0 is January 2014
+    '''
     datetime = pd.to_datetime(date)
     months_since_jan_2014 = (datetime.year - 2014) * 12 + datetime.month - 1
     return months_since_jan_2014
@@ -36,6 +39,8 @@ def determine_splits(config):
 
     j=0
     group=0
+
+    # constructing several time chops as described in our report.
     for test_start in test_label_starts:
         train_label_ends = np.arange(
             test_start - time_config['max_training_histories'] + time_config['training_label_timespans'],
@@ -51,6 +56,7 @@ def determine_splits(config):
         test_feature_start = np.minimum(test_feature_end - time_config['min_training_histories'], test_feature_start)
         
         
+        # storing splits in a dataframe
         for i in range(len(feature_ends)):
             new_split = {
                 'feature_start': feature_starts[i],
@@ -83,6 +89,8 @@ def generating_splits(split_df, df, labels):
     X_tests = []
     y_tests = []
     groups = []
+
+    # chopping off data at the previously defined time chops
     for group in split_df['group'].unique():
         for i in split_df.loc[split_df['group'] == group,:].index:
             
@@ -102,6 +110,9 @@ def generating_splits(split_df, df, labels):
 
 
 def split_data(features, labels):
+    '''
+    Generates time splits based on config.yaml file and splits data accordingly.
+    '''
     config_path = 'ml/config.yaml'
     with open(config_path, 'r') as dbf:
         config = yaml.safe_load(dbf)

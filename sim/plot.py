@@ -5,6 +5,9 @@ sns.set_context("paper", font_scale = 1.2)
 color = sns.color_palette("tab10", 10)[0]
 
 def is_in_frontier(df, metric1, metric2, row):
+    '''
+    returns a flag on whether a point is in the efficient frontier in a scatterplot.
+    '''
     df_filtered = df.loc[((df[metric1] < df.loc[row,metric1]) & (df[metric2] < df.loc[row, metric2])),:].copy()
     if len(df_filtered) == 0:
         return True
@@ -12,6 +15,10 @@ def is_in_frontier(df, metric1, metric2, row):
         return False
 
 def plot_simulation(metrics):
+    '''
+    Saves five different plots in output/scenarios
+    '''
+
     print(" > Exporting plots...")
     print(" > Plot 1: What are the different simulations (demand curve)? Which of them are feasible?")
     metrics['total_costs'] /= 1000000
@@ -58,4 +65,5 @@ def plot_simulation(metrics):
     plt.savefig('output/scenarios/5-prop_per_gallon_price.png',dpi=600)
     plt.clf()
 
+    print(" > Five plots saved to output/scenarios.")
     print(" > Done.")

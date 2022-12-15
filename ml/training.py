@@ -86,6 +86,7 @@ def train_pipeline(X_train, y_train, X_test, y_test, models):
     X_train = np.array(X_train) 
     X_test = np.array(X_test) 
 
+    # train and score models
     scores = []
     for m in models.keys():
         scores.append(score_cv(models[m], X_train, y_train, X_test, y_test))

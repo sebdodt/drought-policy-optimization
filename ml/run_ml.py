@@ -3,13 +3,13 @@ import numpy as np
 import pandas as pd
 
 def run_ml():
-    # labels
+    # define labels
     supply = labels.read_data()
     supply = labels.data_cleaning(supply)
     label_df = labels.label_construction(supply)
     label_df = labels.match_counties(label_df)
 
-    # features
+    # define features
     feature_df = features.read_data()
     validation_sets = time_splits.split_data(feature_df, label_df)
     validation_sets_eng = features.generate_features(validation_sets)
@@ -37,7 +37,6 @@ def run_ml():
     print(" > That is equivalent to {af} acre-feet of water.".format(af = available_amount_for_avg_county))
 
     print(" > Done.")
-
     return available_amount_for_avg_county 
 
 
