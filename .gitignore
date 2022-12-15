@@ -137,4 +137,5 @@ data/checking
 *playground.py
 *playground.ipynb
 *.DS_Store
-*.png
+output/old
+sim/old
