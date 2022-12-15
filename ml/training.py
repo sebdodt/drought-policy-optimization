@@ -106,6 +106,6 @@ def train(datalist):
             scores, models = train_pipeline(X_trains[i], y_trains[i], X_tests[i], y_tests[i], models)
             rmse[i,1:len(scores)+1] = scores
             i+=1
-            print(" > Finished time split {i}/6.".format(i=i))
+            print(" > Finished time split {i}/5.".format(i=i))
     print(" > Training finished.")
     return rmse, ['baseline'] + list(models.keys()), models
